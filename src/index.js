@@ -1,30 +1,42 @@
-/*
- * Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT license.
- * See LICENSE in the project root for license information.
- */
+import * as OfficeHelpers from "@microsoft/office-js-helpers";
 
-import * as OfficeHelpers from '@microsoft/office-js-helpers';
-
-$(document).ready(() => {
-    $('#run').click(run);
+Office.onReady(() => {
+    // Office is ready
+    $(document).ready(() => {
+        // The document is ready
+        $('#addOutline').click(addOutlineToPage);
+    });
 });
-  
-// The initialize function must be run each time a new page is loaded
-Office.initialize = (reason) => {
-    $('#sideload-msg').hide();
-    $('#app-body').show();
-};
 
-async function run() {
+async function addOutlineToPage() {
     try {
-            await OneNote.run(async context => {
-                /**
-                 * Insert your OneNote code here
-                 */
-                return context.sync();
-            });
-        } catch (error) {
-            OfficeHelpers.UI.notify(error);
-            OfficeHelpers.Utilities.log(error);
-        }
+        await OneNote.run(async context => {
+            var html = "<p>" + $("#textBox").val() + "</p>";
+
+            // Get the current page.
+            var page = context.application.getActivePage();
+
+            // Queue a command to load the page with the title property.
+            page.load("title");
+
+            // Add text to the page by using the specified HTML.
+            var outline = page.addOutline(40, 90, html);
+
+            // Run the queued commands, and return a promise to indicate task completion.
+            return context.sync()
+                .then(function() {
+                    console.log("Added outline to page " + page.title);
+                })
+                .catch(function(error) {
+                    app.showNotification("Error: " + error);
+                    console.log("Error: " + error);
+                    if (error instanceof OfficeExtension.Error) {
+                        console.log("Debug info: " + JSON.stringify(error.debugInfo));
+                    }
+                });
+        });
+    } catch (error) {
+        OfficeHelpers.UI.notify(error);
+        OfficeHelpers.Utilities.log(error);
+    }
 }
