@@ -17,7 +17,7 @@
   },
   "devDependencies": {
     "@types/jquery": "^3.3.29",
-    "@types/office-js": "^0.0.140",
+    "@types/office-js": "^1.0.0",
     "babel-core": "^6.26.0",
     "babel-loader": "^7.1.4",
     "babel-preset-env": "^1.6.1",
